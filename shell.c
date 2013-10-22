@@ -194,19 +194,30 @@ void processProgramExecution(char *firstCmd)
 {
    char *cmd[] = {(char *)0, '\0', '\0'};
    char *temp = malloc(MAX_LINE_LENGTH * sizeof(char));
-   cmd[0] = malloc(MAX_LINE_LENGTH * sizeof(char));
-
-   // Remove the newline character from the filename
-   firstCmd[strlen(firstCmd)-1] = 0;
- 
-   strcpy(temp, "./");
-   strcat(temp, firstCmd);
-   cmd[0] = temp;
-   
-   if ( execvp(cmd[0], cmd) < 0 )
+   int pid = fork();
+   int stat;
+   // Call execvp if this is the child process
+   if ( pid == 0 )
    {
-      showErrorMessage("INVALID CMD");
-      return;
+      cmd[0] = malloc(MAX_LINE_LENGTH * sizeof(char));
+
+      // Remove the newline character from the filename
+      firstCmd[strlen(firstCmd)-1] = 0;
+ 
+      strcpy(temp, "./");
+      strcat(temp, firstCmd);
+      cmd[0] = temp;
+   
+      if ( execvp(cmd[0], cmd) < 0 )
+      {
+         showErrorMessage("INVALID CMD");
+         return;
+      }
+   }
+   else
+   {
+      // Wait for child process to end before continuing
+      waitpid(pid, &stat, WUNTRACED);
    }
 }
 
