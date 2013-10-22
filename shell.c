@@ -192,10 +192,18 @@ void processDeleteCmd(char *secondCmd)
 
 void processProgramExecution(char *firstCmd)
 {
+   char *cmd[] = {(char *)0, '\0', '\0'};
+   char *temp = malloc(MAX_LINE_LENGTH * sizeof(char));
+   cmd[0] = malloc(MAX_LINE_LENGTH * sizeof(char));
+
    // Remove the newline character from the filename
    firstCmd[strlen(firstCmd)-1] = 0;
-   //char *cmd[];
-   if ( execvp(firstCmd, '\0') < 0 )
+ 
+   strcpy(temp, "./");
+   strcat(temp, firstCmd);
+   cmd[0] = temp;
+   
+   if ( execvp(cmd[0], cmd) < 0 )
    {
       showErrorMessage("INVALID CMD");
       return;
